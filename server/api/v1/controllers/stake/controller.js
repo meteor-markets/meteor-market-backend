@@ -33,7 +33,7 @@ export class userController {
 
   /**
    * @swagger
-   * /user/addStake:
+   * /stake/addStake:
    *   post:
    *     tags:
    *       - STAKE MANAGEMENT
@@ -123,7 +123,7 @@ export class userController {
 
   /**
    * @swagger
-   * /user/listStake:
+   * /stake/listStake:
    *   get:
    *     tags:
    *       - STAKE MANAGEMENT
@@ -188,7 +188,7 @@ export class userController {
 
   /**
    * @swagger
-   * /user/viewStake:
+   * /stake/viewStake:
    *   get:
    *     tags:
    *       - STAKE MANAGEMENT
@@ -227,7 +227,7 @@ export class userController {
 
   /**
   * @swagger
-  * /user/unstake:
+  * /stake/unstake:
   *   put:
   *     tags:
   *       - STAKE MANAGEMENT
@@ -279,7 +279,7 @@ export class userController {
 
   /**
   * @swagger
-  * /user/emergencyUnstake:
+  * /stake/emergencyUnstake:
   *   put:
   *     tags:
   *       - STAKE MANAGEMENT
