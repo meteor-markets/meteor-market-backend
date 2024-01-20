@@ -39,23 +39,32 @@ module.exports = Mongoose.model("coin", coinSchema);
     }
     else {
         const object1 = {
-            coinName: coinType.BTC,
-            coinImage: coinImage.BTC,
-            coinIndex: coinIndex.BTC
-        };
-        const object2 = {
-            coinName: coinType.ETH,
-            coinImage: coinImage.ETH,
-            coinIndex: coinIndex.ETH
-
-        };
-        const object3 = {
             coinName: coinType.USDT,
             coinImage: coinImage.USDT,
             coinIndex: coinIndex.USDT
-
         };
-        let coinResult = await Mongoose.model("coin", coinSchema).create(object1, object2, object3);
+        const object2 = {
+            coinName: coinType.BUSD,
+            coinImage: coinImage.BUSD,
+            coinIndex: coinIndex.BUSD
+        };
+        const object3 = {
+            coinName: coinType.MATIC,
+            coinImage: coinImage.MATIC,
+            coinIndex: coinIndex.MATIC
+        };
+        const object4 = {
+            coinName: coinType.BNB,
+            coinImage: coinImage.BNB,
+            coinIndex: coinIndex.BNB
+        };
+        const object5 = {
+            coinName: coinType.ETH,
+            coinImage: coinImage.ETH,
+            coinIndex: coinIndex.ETH
+        };
+
+        let coinResult = await Mongoose.model("coin", coinSchema).create(object1, object2, object3, object4, object5);
         if (coinResult) {
             console.log("DEFAULT coin created.", coinResult)
         }

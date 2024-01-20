@@ -1,6 +1,8 @@
 module.exports = Object.freeze({
   USDT: "USDT",
-  BTC: "BTC",
+  BUSD: "BUSD",
+  MATIC: "MATIC",
+  BNB: "BNB",
   ETH: "ETH"
 
 });

@@ -5,7 +5,7 @@ const feeSettingServices = {
     return await feeSettingModel.create(insertObj);
   },
   findFeeSetting: async (query) => {
-    return await feeSettingModel.findOne(query).populate("userId");
+    return await feeSettingModel.findOne(query);
   },
   updateFeeSetting: async (query, updateObj) => {
     return await feeSettingModel.findOneAndUpdate(query, updateObj, {

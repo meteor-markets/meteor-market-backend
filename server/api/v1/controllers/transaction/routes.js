@@ -18,5 +18,8 @@ export default Express.Router()
 
 
     .use(auth.verifyToken)
+    .get("/transactionList", controller.transactionList)
+    .post("/withdraw", controller.withdraw)
+    .post("/deposit", controller.deposit)
 
 
