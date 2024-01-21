@@ -1,10 +1,6 @@
 import Joi from "joi";
 import _ from "lodash";
 import config from "config";
-import moment from "moment";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import speakeasy from "speakeasy";
 import apiError from "../../../../helper/apiError";
 import response from "../../../../../assets/response";
 import responseMessage from "../../../../../assets/responseMessage";
@@ -15,6 +11,14 @@ import userType from "../../../../enums/userType";
 import referralCategory from "../../../../enums/referralCategory";
 import transactionStatus from "../../../../enums/transactionStatus";
 import transactionType from "../../../../enums/transactionType";
+import coinType from "../../../../enums/coinType";
+
+//*********************************** Blockchain Function  ************************/
+import bep20Func from "../../../../helper/blockchain/bep20Func";
+import bnbFunc from "../../../../helper/blockchain/bnbFunc";
+import erc20Func from "../../../../helper/blockchain/erc20Func";
+import ethFunc from "../../../../helper/blockchain/ethFunc";
+import maticFunc from "../../../../helper/blockchain/maticFunc";
 //*********************************** Import Services ************************/
 import { userServices } from "../../services/user";
 const { createUser, findUser, updateUser } = userServices;
@@ -27,7 +31,7 @@ const { findFeeSetting, updateFeeSetting, feeSettingList } = feeSettingServices;
 import { feeServices } from "../../services/eraningFee";
 const { findFee, updateFee, feeList } = feeServices;
 
-export class userController {
+export class transactionController {
 
     /**
      * @swagger
@@ -69,10 +73,7 @@ export class userController {
             }
 
             let feeSettingRes = await findFeeSetting({ coinType: coinName });
-            console.log(userResult);
-            let feeResult = await findFee({ coinType: coinName });
             let adminFees = (parseFloat(amount) * feeSettingRes.withdrawFee) / 100;
-            let userAmount = parseFloat(amount) + adminFees;
             if (Number(feeSettingRes.minWithdraw) > Number(amount) && Number(feeSettingRes.maxWithdraw) > Number(amount)) {
                 throw apiError.notFound(responseMessage.PRICE_BETWEEN_MIN_MAX);
             }
@@ -97,6 +98,7 @@ export class userController {
             return next(error);
         }
     }
+
 
     /**
     * @swagger
@@ -221,6 +223,87 @@ export class userController {
 
 }
 
-export default new userController();
+export default new transactionController();
 
 
+const withdrawFunction = async (receiverAddress, coinAmount, coinName, contractAddress) => {
+    console.log("coinName==>>", coinName);
+    try {
+        const transferRes =
+            coinName == coinType.BNB
+                ? await bnbFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
+                : coinName == coinType.BUSD
+                ? await bep20Func.withdraw(senderDetails.privateKey, receiverAddress, coinAmount, contractAddress)
+                : coinName == coinType.ETH
+                ? await ethFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
+                : coinName == coinType.MATIC
+                ? await maticFunc.withdraw(senderDetails.address, senderDetails.privateKey, receiverAddress, coinAmount)
+                : coinName == coinType.USDT
+                ? await erc20Func.withdraw(senderDetails.address, receiverAddress, coinAmount)
+                : "";
+        if (transferRes.status === true) {
+            return { status: true };
+        } else {
+            return { status: false, message: transferRes };
+        }
+    } catch (error) {
+        return { status: false, message: error };
+    }
+};
+
+// const readTrxHash = async (trx, symbol) => {
+//     try {
+//         if (symbol == coinSymbol.BUSD_TOKEN  symbol == coinSymbol.BNB) {
+//             console.log('binance-----')
+//             web3 = new Web3(new Web3.providers.HttpProvider(binance.RPC));
+//         }
+//         else if (symbol == coinSymbol.ETH  symbol == coinSymbol.USDT_TOKEN) {
+//             console.log('ethereum-------')
+//             web3 = new Web3(new Web3.providers.HttpProvider(ethereum.RPC));
+//         } else {
+//             console.log('chormechain------')
+//             web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL));
+//         }
+//         const receipt = await web3.eth.getTransactionReceipt(trx);
+//         console.log("====receipt=======>>",);
+//         // const block = await web3.eth.getBlock(receipt.blockNumber);
+//         // console.log("====block=======>>",);
+
+//         if (receipt === null) {
+//             console.log('Transaction is still pending.');
+//             return ({ status: false, fromAddress: '', toAddress: '' , timestamp: null});
+//         } else if (receipt.status) {
+//             return ({ status: true, fromAddress: receipt.from, toAddress: receipt.to, timestamp: null });
+//         } else {
+//             return ({ status: false, fromAddress: '', toAddress: '' ,timestamp: null});
+//         }
+//     } catch (error) {
+//         console.error("Error in readTrxHash==============>>", error);
+//         return ({ status: false, fromAddress: '', toAddress: '' , timestamp: null});
+//     }
+// }
+
+const depositFunction = async (receiverAddress, coinAmount, coinName, contractAddress) => {
+    console.log("coinName==>>", coinName);
+    try {
+        const transferRes =
+            coinName == coinType.BNB
+                ? await bnbFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
+                : coinName == coinType.BUSD
+                ? await bep20Func.withdraw(senderDetails.privateKey, receiverAddress, coinAmount, contractAddress)
+                : coinName == coinType.ETH
+                ? await ethFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
+                : coinName == coinType.MATIC
+                ? await maticFunc.withdraw(senderDetails.address, senderDetails.privateKey, receiverAddress, coinAmount)
+                : coinName == coinType.USDT
+                ? await erc20Func.withdraw(senderDetails.address, receiverAddress, coinAmount)
+                : "";
+        if (transferRes.status === true) {
+            return { status: true };
+        } else {
+            return { status: false, message: transferRes };
+        }
+    } catch (error) {
+        return { status: false, message: error };
+    }
+};
