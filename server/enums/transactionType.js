@@ -1,6 +1,6 @@
 module.exports = Object.freeze({
-  STAKE: "STAKE",
-  UNSTAKE: "UNSTAKE",
-  DEPOSIT: "DEPOSIT",
+  BORROW: "BORROW",
+  REPAY: "REPAY",
+  SUPPLY: "SUPPLY",
   WITHDRAW: "WITHDRAW",
 });

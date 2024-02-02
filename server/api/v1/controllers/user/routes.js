@@ -23,5 +23,4 @@ export default Express.Router()
     .use(auth.verifyToken)
     .get('/getProfile', controller.getProfile)
 
-    .post('/directIndirectUserList', controller.directIndirectUserList)
-    .put('/editProfile', controller.editProfile)
+

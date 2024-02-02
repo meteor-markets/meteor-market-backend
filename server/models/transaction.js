@@ -17,7 +17,6 @@ const options = {
 const schemaDefination = new Schema(
     {
         userId: { type: Schema.Types.ObjectId, ref: "user" },
-        // userId: { type: Schema.Types.ObjectId, ref: "user" },
         walletAddress: { type: String },
         coinName: { type: String },
         coinImage: { type: String },
@@ -28,7 +27,7 @@ const schemaDefination = new Schema(
         description: { type: String },
         transactionType: {
             type: String,
-            enum: [transactionType.DEPOSIT, transactionType.WITHDRAW],
+            enum: [transactionType.BORROW, transactionType.REPAY, transactionType.SUPPLY, transactionType.WITHDRAW],
         },
         transactionStatus: {
             type: String,
