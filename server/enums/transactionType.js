@@ -3,4 +3,5 @@ module.exports = Object.freeze({
   REPAY: "REPAY",
   SUPPLY: "SUPPLY",
   WITHDRAW: "WITHDRAW",
+  SWAP: "SWAP"
 });

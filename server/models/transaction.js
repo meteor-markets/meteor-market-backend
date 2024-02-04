@@ -27,7 +27,7 @@ const schemaDefination = new Schema(
         description: { type: String },
         transactionType: {
             type: String,
-            enum: [transactionType.BORROW, transactionType.REPAY, transactionType.SUPPLY, transactionType.WITHDRAW],
+            enum: [transactionType.BORROW, transactionType.REPAY, transactionType.SUPPLY, transactionType.WITHDRAW, transactionType.SWAP],
         },
         transactionStatus: {
             type: String,

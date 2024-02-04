@@ -50,7 +50,7 @@ module.exports = Mongoose.model("static", staticSchema);
             description: "It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
         };
         var object4 = {
-            type: "refund",
+            type: "Refund",
             title: "Refund",
             description: "Please take a moment to review our refund policy carefully. If you have any questions or concerns, don't hesitate to contact our customer support team."
         };
