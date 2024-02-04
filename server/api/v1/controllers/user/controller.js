@@ -86,7 +86,6 @@ export class userController {
   async connectWallet(req, res, next) {
     const validationSchema = Joi.object({
       walletAddress: Joi.string().required(),
-      referralCode: Joi.string().optional(),
     });
 
     try {
@@ -95,17 +94,6 @@ export class userController {
         walletAddress: validatedBody.walletAddress,
         status: { $ne: status.DELETE },
       });
-      let referredByUser = null;
-
-      if (validatedBody.referralCode) {
-        referredByUser = await findUser({
-          referralCode: validatedBody.referralCode,
-        });
-
-        if (!referredByUser) {
-          throw apiError.invalid(responseMessage.INVALID_REFERRAL);
-        }
-      }
 
       if (resultRes) {
         var token = await commonFunction.getToken({
@@ -116,34 +104,13 @@ export class userController {
           _id: resultRes._id,
           walletAddress: resultRes.walletAddress,
           userType: resultRes.userType,
-          referralCode: resultRes.referralCode,
           token: token,
         };
         return res.json(new response(obj, responseMessage.LOGIN));
       } else {
         let saveRes = await createUser({
           walletAddress: validatedBody.walletAddress,
-          referralCode: await commonFunction.generateReferralCode(),
-          referredBy: referredByUser ? referredByUser._id : null,
         });
-
-        if (referredByUser) {
-          await createReferral({
-            userId: saveRes._id,
-            earning: 10,
-            referredBy: referredByUser._id,
-            category: referralCategory.DIRECT,
-          });
-
-          if (referredByUser.referredBy) {
-            await createReferral({
-              userId: saveRes._id,
-              earning: 5,
-              referredBy: referredByUser.referredBy,
-              category: referralCategory.INDIRECT,
-            });
-          }
-        }
 
         var token = await commonFunction.getToken({
           _id: saveRes._id,
@@ -153,7 +120,6 @@ export class userController {
           _id: saveRes._id,
           walletAddress: saveRes.walletAddress,
           userType: saveRes.userType,
-          referralCode: saveRes.referralCode,
           token: token,
         };
 

@@ -99,6 +99,42 @@ export class transactionController {
         }
     }
 
+    async supply(req, res, next) {
+        try {
+            const validatedBody = await (req.body);
+            const { coinName, walletAddress, amount, transactionDetails } = validatedBody;
+            let userResult = await findUser({ _id: req.userId, status: { $ne: status.DELETE } });
+            if (!userResult) {
+                throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+            }
+
+            // let feeSettingRes = await findFeeSetting({ coinType: coinName });
+            // let adminFees = (parseFloat(amount) * feeSettingRes.withdrawFee) / 100;
+            // if (Number(feeSettingRes.minWithdraw) > Number(amount) && Number(feeSettingRes.maxWithdraw) > Number(amount)) {
+            //     throw apiError.notFound(responseMessage.PRICE_BETWEEN_MIN_MAX);
+            // }
+
+            let transaction = await createTransaction({
+                title: transactionType.SUPPLY,
+                description: `${amount} ${coinName} supplied by ${walletAddress} Address.`,
+                userId: userResult._id,
+                coinName: coinName,
+                amount: amount,
+                walletAddress: walletAddress,
+                transactionType: transactionType.SUPPLY,
+                transactionHash: transactionDetails.transactionHash,
+                transactionStatus: transactionStatus.SUCCESS
+            })
+            return res.json(
+                new response(transaction, responseMessage.TRANSACTION_SUCCESS)
+            );
+        } catch (error) {
+            console.log("error in send MoneyTransfer =============>>>", error);
+            return next(error);
+        }
+    }
+
+
 
     /**
     * @swagger
@@ -233,14 +269,14 @@ const withdrawFunction = async (receiverAddress, coinAmount, coinName, contractA
             coinName == coinType.BNB
                 ? await bnbFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
                 : coinName == coinType.BUSD
-                ? await bep20Func.withdraw(senderDetails.privateKey, receiverAddress, coinAmount, contractAddress)
-                : coinName == coinType.ETH
-                ? await ethFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
-                : coinName == coinType.MATIC
-                ? await maticFunc.withdraw(senderDetails.address, senderDetails.privateKey, receiverAddress, coinAmount)
-                : coinName == coinType.USDT
-                ? await erc20Func.withdraw(senderDetails.address, receiverAddress, coinAmount)
-                : "";
+                    ? await bep20Func.withdraw(senderDetails.privateKey, receiverAddress, coinAmount, contractAddress)
+                    : coinName == coinType.ETH
+                        ? await ethFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
+                        : coinName == coinType.MATIC
+                            ? await maticFunc.withdraw(senderDetails.address, senderDetails.privateKey, receiverAddress, coinAmount)
+                            : coinName == coinType.USDT
+                                ? await erc20Func.withdraw(senderDetails.address, receiverAddress, coinAmount)
+                                : "";
         if (transferRes.status === true) {
             return { status: true };
         } else {
@@ -290,14 +326,14 @@ const depositFunction = async (receiverAddress, coinAmount, coinName, contractAd
             coinName == coinType.BNB
                 ? await bnbFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
                 : coinName == coinType.BUSD
-                ? await bep20Func.withdraw(senderDetails.privateKey, receiverAddress, coinAmount, contractAddress)
-                : coinName == coinType.ETH
-                ? await ethFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
-                : coinName == coinType.MATIC
-                ? await maticFunc.withdraw(senderDetails.address, senderDetails.privateKey, receiverAddress, coinAmount)
-                : coinName == coinType.USDT
-                ? await erc20Func.withdraw(senderDetails.address, receiverAddress, coinAmount)
-                : "";
+                    ? await bep20Func.withdraw(senderDetails.privateKey, receiverAddress, coinAmount, contractAddress)
+                    : coinName == coinType.ETH
+                        ? await ethFunc.withdraw(receiverAddress, senderDetails.privateKey, coinAmount, contractAddress)
+                        : coinName == coinType.MATIC
+                            ? await maticFunc.withdraw(senderDetails.address, senderDetails.privateKey, receiverAddress, coinAmount)
+                            : coinName == coinType.USDT
+                                ? await erc20Func.withdraw(senderDetails.address, receiverAddress, coinAmount)
+                                : "";
         if (transferRes.status === true) {
             return { status: true };
         } else {

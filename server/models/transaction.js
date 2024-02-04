@@ -23,12 +23,11 @@ const schemaDefination = new Schema(
         coinImage: { type: String },
         amount: { type: Number },
         transactionHash: { type: String },
-        transactionFee: { type: String },
         title: { type: String },
         description: { type: String },
         transactionType: {
             type: String,
-            enum: [transactionType.DEPOSIT, transactionType.WITHDRAW],
+            enum: [transactionType.SUPPLY, transactionType.BORROW, transactionType.REPAY, transactionType.WITHDRAW],
         },
         transactionStatus: {
             type: String,
