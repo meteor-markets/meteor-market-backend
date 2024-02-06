@@ -30,6 +30,19 @@ const coinSchema = new Schema(
         chianIdHEX: {
             type: String
         },
+        supplyAPY: {
+            type: Number
+        },
+        sRewardAPR: {
+            type: Number
+        },
+        borrowAPY: {
+            type: Number
+        },
+        bRewardAPR: {
+            type: Number
+        },
+
         status: { type: String, default: status.ACTIVE },
     },
     options
@@ -46,45 +59,131 @@ module.exports = Mongoose.model("coin", coinSchema);
     }
     else {
         const object1 = {
-            coinName: coinType.USDT,
-            coinImage: coinImage.USDT,
-            coinIndex: coinIndex.USDT,
+            coinName: coinType.DAI,
+            coinImage: coinImage.DAI,
+            coinIndex: coinIndex.DAI,
             chainId: ethereum.chainId,
-            chianIdHEX: ethereum.chianIdHEX
+            chianIdHEX: ethereum.chianIdHEX,
+            supplyAPY: 4,
+            sRewardAPR: 0.1,
+            borrowAPY: 2,
+            bRewardAPR: 0.2,
+
         };
         const object2 = {
-            coinName: coinType.BUSD,
-            coinImage: coinImage.BUSD,
-            coinIndex: coinIndex.BUSD,
+            coinName: coinType.LUSD,
+            coinImage: coinImage.LUSD,
+            coinIndex: coinIndex.LUSD,
             chainId: binance.chainId,
-            chianIdHEX: binance.chianIdHEX
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4,
+            sRewardAPR: 0.1,
+            borrowAPY: 2,
+            bRewardAPR: 0.2,
 
         };
         const object3 = {
-            coinName: coinType.MATIC,
-            coinImage: coinImage.MATIC,
-            coinIndex: coinIndex.MATIC,
-            chainId: polygon.chainId,
-            chianIdHEX: polygon.chianIdHEX
+            coinName: coinType.MAI,
+            coinImage: coinImage.MAI,
+            coinIndex: coinIndex.MAI,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4,
+            sRewardAPR: 0.1,
+            borrowAPY: 2,
+            bRewardAPR: 0.2,
 
         };
         const object4 = {
-            coinName: coinType.BNB,
-            coinImage: coinImage.BNB,
-            coinIndex: coinIndex.BNB,
+            coinName: coinType.OP,
+            coinImage: coinImage.OP,
+            coinIndex: coinIndex.OP,
             chainId: binance.chainId,
-            chianIdHEX: binance.chianIdHEX
-
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4.3,
+            sRewardAPR: 0.1,
+            borrowAPY: 2.2,
+            bRewardAPR: 0.5,
         };
         const object5 = {
-            coinName: coinType.ETH,
-            coinImage: coinImage.ETH,
-            coinIndex: coinIndex.ETH,
-            chainId: ethereum.chainId,
-            chianIdHEX: ethereum.chianIdHEX
+            coinName: coinType.SNX,
+            coinImage: coinImage.SNX,
+            coinIndex: coinIndex.SNX,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 5.2,
+            sRewardAPR: 0.4,
+            borrowAPY: 1.3,
+            bRewardAPR: 0.9,
+        };
+        const object6 = {
+            coinName: coinType.USDC,
+            coinImage: coinImage.USDC,
+            coinIndex: coinIndex.USDC,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4.0,
+            sRewardAPR: 0.5,
+            borrowAPY: 1.3,
+            bRewardAPR: 0.3,
+        };
+        const object7 = {
+            coinName: coinType.USDT,
+            coinImage: coinImage.USDT,
+            coinIndex: coinIndex.USDT,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 1.1,
+            sRewardAPR: 0.5,
+            borrowAPY: 2.3,
+            bRewardAPR: 0.2,
+        };
+        const object8 = {
+            coinName: coinType.WBTC,
+            coinImage: coinImage.WBTC,
+            coinIndex: coinIndex.WBTC,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4.0,
+            sRewardAPR: 0.1,
+            borrowAPY: 2.7,
+            bRewardAPR: 0.2,
+        };
+        const object9 = {
+            coinName: coinType.WETH,
+            coinImage: coinImage.WETH,
+            coinIndex: coinIndex.WETH,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 7.3,
+            sRewardAPR: 0.1,
+            borrowAPY: 2.5,
+            bRewardAPR: 0.2,
+        };
+        const object10 = {
+            coinName: coinType.sUSD,
+            coinImage: coinImage.sUSD,
+            coinIndex: coinIndex.sUSD,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4.4,
+            sRewardAPR: 0.1,
+            borrowAPY: 2.4,
+            bRewardAPR: 0.2,
+        };
+        const object11 = {
+            coinName: coinType.wstETH,
+            coinImage: coinImage.wstETH,
+            coinIndex: coinIndex.wstETH,
+            chainId: binance.chainId,
+            chianIdHEX: binance.chianIdHEX,
+            supplyAPY: 4.5,
+            sRewardAPR: 0.1,
+            borrowAPY: 2.6,
+            bRewardAPR: 0.2,
         };
 
-        let coinResult = await Mongoose.model("coin", coinSchema).create(object1, object2, object3, object4, object5);
+        let coinResult = await Mongoose.model("coin", coinSchema).create(object1, object2, object3, object4, object5, object6, object7, object8, object9, object10, object11);
         if (coinResult) {
             console.log("DEFAULT coin created.", coinResult)
         }

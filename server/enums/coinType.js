@@ -1,8 +1,14 @@
 module.exports = Object.freeze({
+  DAI: "DAI",
+  LUSD: "LUSD",
+  MAI: "MAI",
+  OP: "OP",
+  SNX: "SNX",
+  USDC: "USDC",
   USDT: "USDT",
-  BUSD: "BUSD",
-  MATIC: "MATIC",
-  BNB: "BNB",
-  ETH: "ETH"
-
+  WBTC: "WBTC",
+  WETH: "WETH",
+  sUSD: "sUSD",
+  wstETH: "wstETH",
+  
 });
