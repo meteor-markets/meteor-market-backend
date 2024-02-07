@@ -89,64 +89,64 @@ export class adminController {
   }
 
 
-  /**
-   * @swagger
-   * /admin/updateAdminProfile:
-   *   put:
-   *     tags:
-   *       - ADMIN
-   *     description: updateAdminProfile 
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: email
-   *         description: email
-   *         in: formData
-   *         required: false
-   *       - name: firstName
-   *         description: firstName
-   *         in: formData
-   *         required: false
-   *       - name: lastName
-   *         description: lastName
-   *         in: formData
-   *         required: false
-   *       - name: countryCode
-   *         description: countryCode
-   *         in: formData
-   *         required: false
-   *       - name: mobileNumber
-   *         description: mobileNumber
-   *         in: formData
-   *         required: false
-   *       - name: state
-   *         description: state
-   *         in: formData
-   *         required: false
-   *       - name: profilePic
-   *         description: profilePic
-   *         in: formData
-   *         required: false
-   *       - name: address
-   *         description: address
-   *         in: formData
-   *         required: false
-   *       - name: city
-   *         description: city
-   *         in: formData
-   *         required: false
-   *       - name: country
-   *         description: country
-   *         in: formData
-   *         required: false
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
+  // /**
+  //  * @swagger
+  //  * /admin/updateAdminProfile:
+  //  *   put:
+  //  *     tags:
+  //  *       - ADMIN
+  //  *     description: updateAdminProfile 
+  //  *     produces:
+  //  *       - application/json
+  //  *     parameters:
+  //  *       - name: token
+  //  *         description: token
+  //  *         in: header
+  //  *         required: true
+  //  *       - name: email
+  //  *         description: email
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: firstName
+  //  *         description: firstName
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: lastName
+  //  *         description: lastName
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: countryCode
+  //  *         description: countryCode
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: mobileNumber
+  //  *         description: mobileNumber
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: state
+  //  *         description: state
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: profilePic
+  //  *         description: profilePic
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: address
+  //  *         description: address
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: city
+  //  *         description: city
+  //  *         in: formData
+  //  *         required: false
+  //  *       - name: country
+  //  *         description: country
+  //  *         in: formData
+  //  *         required: false
+  //  *     responses:
+  //  *       200:
+  //  *         description: Returns success message
+  //  */
   async updateAdminProfile(req, res, next) {
     const validationSchema = Joi.object({
       firstName: Joi.string().allow("").optional(),
