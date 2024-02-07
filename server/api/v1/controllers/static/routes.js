@@ -5,7 +5,6 @@ import auth from '../../../../helper/auth';
 
 export default Express.Router()
 
-    .get('/getCointList', controller.getCoinList)
     .get('/viewStaticContent', controller.viewStaticContent)
     .get('/staticContentList', controller.staticContentList)
     
