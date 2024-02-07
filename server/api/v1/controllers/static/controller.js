@@ -13,7 +13,8 @@ import { staticServices } from '../../services/static';
 const { createStaticContent, findStaticContent, updateStaticContent, staticContentList, findStaticLinkContent } = staticServices;
 import { userServices } from '../../services/user';
 const { findUser } = userServices;
-
+import { coinServices } from '../../services/coin';
+const { coinList } = coinServices;
 
 export class staticController {
 
@@ -43,6 +44,19 @@ export class staticController {
     try {
       const validatedBody = await validationSchema.validateAsync(req.query);
       var result = await findStaticContent({ type: validatedBody.type });
+      return res.json(new response(result, responseMessage.DATA_FOUND));
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async getCoinList(req, res, next) {
+    const validationSchema = Joi.object({
+      type: Joi.string().optional(),
+    });
+    try {
+      const validatedBody = await validationSchema.validateAsync(req.query);
+      var result = await coinList();
       return res.json(new response(result, responseMessage.DATA_FOUND));
     } catch (error) {
       return next(error);
