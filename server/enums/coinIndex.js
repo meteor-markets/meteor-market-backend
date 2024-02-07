@@ -9,5 +9,6 @@ module.exports = Object.freeze({
   WBTC: 8,
   WETH: 9,
   sUSD: 10,
-  wstETH: 11
+  wstETH: 11,
+  BLAST: 12
 });

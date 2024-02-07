@@ -182,8 +182,19 @@ module.exports = Mongoose.model("coin", coinSchema);
             borrowAPY: 2.6,
             bRewardAPR: 0.2,
         };
+        const object12 = {
+            coinName: coinType.BLAST,
+            coinImage: coinImage.BLAST,
+            coinIndex: coinIndex.BLAST,
+            chainId: "168587773",
+            chianIdHEX: "0xA0C71FD",
+            supplyAPY: 2.5,
+            sRewardAPR: 0.9,
+            borrowAPY: 1.6,
+            bRewardAPR: 0.5,
+        };
 
-        let coinResult = await Mongoose.model("coin", coinSchema).create(object1, object2, object3, object4, object5, object6, object7, object8, object9, object10, object11);
+        let coinResult = await Mongoose.model("coin", coinSchema).create(object1, object2, object3, object4, object5, object6, object7, object8, object9, object10, object11, object12);
         if (coinResult) {
             console.log("DEFAULT coin created.", coinResult)
         }

@@ -10,5 +10,6 @@ module.exports = Object.freeze({
   WETH: "WETH",
   sUSD: "sUSD",
   wstETH: "wstETH",
+  BLAST: "BLAST",
   
 });

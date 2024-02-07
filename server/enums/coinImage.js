@@ -9,5 +9,6 @@ module.exports = Object.freeze({
   WBTC: "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707247631/nhoacvqjsj9teuivpi1e.svg",
   WETH: "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707247667/tpqrxuhafiv9461b30jj.svg",
   sUSD: "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707247701/lue8x1d6vzplyfjxlpze.png",
-  wstETH: "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707247725/wdsjky84zt93zysted3a.png"
+  wstETH: "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707247725/wdsjky84zt93zysted3a.png",
+  BLAST: "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707322669/nopqvxpprwypanyemk7w.jpg",
 });
