@@ -144,11 +144,17 @@ export class userController {
    *       200:
    *         description: Returns success message
    */
-  async getProfile(req, res, next) {
+  async getPortfolio(req, res, next) {
+    const validationSchema = Joi.object({
+      walletAddress: Joi.string().required()
+    });
     try {
+      const validatedBody = await validationSchema.validateAsync(req.body);
       let userResult = await findUser({
-        _id: req.userId,
+        walletAddress: validatedBody.walletAddress,
+        status: { $ne: status.DELETE },
       });
+
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
