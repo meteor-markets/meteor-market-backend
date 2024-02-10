@@ -145,9 +145,9 @@ export class userController {
    *         description: Returns success message
    */
   async getPortfolio(req, res, next) {
-    const validationSchema = Joi.object({
-      walletAddress: Joi.string().required()
-    });
+    // const validationSchema = Joi.object({
+    //   walletAddress: Joi.string().required()
+    // });
     try {
       // const validatedBody = await validationSchema.validateAsync(req.body);
       console.log('portfolio params', req.query)
