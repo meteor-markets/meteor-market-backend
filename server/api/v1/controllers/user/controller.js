@@ -126,30 +126,8 @@ export class userController {
   }
 
 
-  /**
-   * @swagger
-   * /user/getProfile:
-   *   get:
-   *     tags:
-   *       - USER
-   *     description: profile
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
   async getPortfolio(req, res, next) {
-    // const validationSchema = Joi.object({
-    //   walletAddress: Joi.string().required()
-    // });
     try {
-      // const validatedBody = await validationSchema.validateAsync(req.body);
       console.log('portfolio params', req.query)
       let userResult = await findUser({
         walletAddress: req.query.walletAddress,
