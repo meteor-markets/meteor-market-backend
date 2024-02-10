@@ -21,6 +21,6 @@ export default Express.Router()
 
     .post('/connectWallet', controller.connectWallet)
     .use(auth.verifyToken)
-    .get('/getPortfolio', controller.getProfile)
+    .get('/getPortfolio', controller.getPortfolio)
 
 
