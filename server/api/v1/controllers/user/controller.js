@@ -149,9 +149,10 @@ export class userController {
       walletAddress: Joi.string().required()
     });
     try {
-      const validatedBody = await validationSchema.validateAsync(req.body);
+      // const validatedBody = await validationSchema.validateAsync(req.body);
+      console.log('portfolio params', req.query)
       let userResult = await findUser({
-        walletAddress: validatedBody.walletAddress,
+        walletAddress: req.query.walletAddress,
         status: { $ne: status.DELETE },
       });
 
