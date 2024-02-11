@@ -145,6 +145,7 @@ module.exports = {
 	UN_STAKE: "Unstake balance successfully.",
 	STAKE_REQUEST: "Stake request send successfully.",
 	ALREADY_APPLY:"Already applied for emergency unstaking",
+	COIN_NOT_FOUND:"Coin not found or does not exist",
 
 
 };

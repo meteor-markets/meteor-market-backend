@@ -19,5 +19,6 @@ export default Express.Router()
 
     .use(auth.verifyToken)
     .get("/transactionList", controller.transactionList)
+    .post("/supply", controller.supply)
 
 
