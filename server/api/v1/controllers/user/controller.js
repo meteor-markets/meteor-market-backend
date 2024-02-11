@@ -12,17 +12,12 @@ import commonFunction from "../../../../helper/util";
 import status from "../../../../enums/status";
 
 import userType from "../../../../enums/userType";
-import referralCategory from "../../../../enums/referralCategory";
 //*********************************** Import Services ************************/
 import { userServices } from "../../services/user";
+import { assets } from "../../../../helper/constants";
 const { createUser, findUser, updateUser } = userServices;
-import { referralServices } from "../../services/referral";
-import { ObjectId } from "mongodb";
-const { createReferral, findReferral, updateReferral, aggregatelistIndirectReferral, aggregatelistDirectReferral, listReferral, referralList } = referralServices;
-
 
 export class userController {
-
   /**
    * @swagger
    * /user/uploadFile:
@@ -47,14 +42,13 @@ export class userController {
       const imageFiles = await commonFunction.getImageUrl(req.files[0].path);
       const obj = {
         fileName: req.files[0].originalname,
-        secureUrl: imageFiles
-      }
+        secureUrl: imageFiles,
+      };
       return res.json(new response(obj, responseMessage.UPLOAD_SUCCESS));
     } catch (error) {
       return next(error);
     }
   }
-
 
   /**
    * @swagger
@@ -70,10 +64,6 @@ export class userController {
    *         description: walletAddress
    *         in: formData
    *         required: true
-   *       - name: referralCode
-   *         description: referralCode
-   *         in: formData
-   *         required: false
    *     responses:
    *       200:
    *         description: Wallet connect successfully.
@@ -96,31 +86,44 @@ export class userController {
       });
 
       if (resultRes) {
-        var token = await commonFunction.getToken({
+        const token = await commonFunction.getToken({
           _id: resultRes._id,
           userType: resultRes.userType,
         });
-        var obj = {
+        let obj = {
           _id: resultRes._id,
           walletAddress: resultRes.walletAddress,
           userType: resultRes.userType,
           token: token,
+          assets: assets,
+          supplyBalance: resultRes.supplyBalance,
+          borrowBalance: resultRes.borrowBalance,
+          netAPY: resultRes.netAPY,
+          borrowLimit: resultRes.borrowLimit,
         };
+
         return res.json(new response(obj, responseMessage.LOGIN));
       } else {
         let saveRes = await createUser({
           walletAddress: validatedBody.walletAddress,
+          assets: assets,
         });
 
-        var token = await commonFunction.getToken({
+        const token = await commonFunction.getToken({
           _id: saveRes._id,
           userType: saveRes.userType,
         });
-        var obj = {
+
+        let obj = {
           _id: saveRes._id,
           walletAddress: saveRes.walletAddress,
           userType: saveRes.userType,
           token: token,
+          assets: assets,
+          supplyBalance: saveRes.supplyBalance,
+          borrowBalance: saveRes.borrowBalance,
+          netAPY: saveRes.netAPY,
+          borrowLimit: saveRes.borrowLimit,
         };
 
         return res.json(new response(obj, responseMessage.LOGIN));
@@ -130,30 +133,22 @@ export class userController {
     }
   }
 
+  async getPortfolio(req, res, next) {
+    const validationSchema = Joi.object({
+      walletAddress: Joi.string().required(),
+    });
 
-  /**
-   * @swagger
-   * /user/getProfile:
-   *   get:
-   *     tags:
-   *       - USER
-   *     description: profile
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
-  async getProfile(req, res, next) {
     try {
+      const validatedBody = await validationSchema.validateAsync(req.query);
+
+      console.log("validate body", validatedBody);
+
+      console.log("portfolio params", req.query);
       let userResult = await findUser({
-        _id: req.userId,
+        walletAddress: req.query.walletAddress,
+        status: { $ne: status.DELETE },
       });
+
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
@@ -162,160 +157,6 @@ export class userController {
       return next(error);
     }
   }
-
-  /**
-   * @swagger
-   * /user/editProfile:
-   *   put:
-   *     tags:
-   *       - USER
-   *     description: editProfile
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: firstName
-   *         description: firstName
-   *         in: formData
-   *         required: false
-   *       - name: lastName
-   *         description: lastName
-   *         in: formData
-   *         required: false
-   *       - name: email
-   *         description: email
-   *         in: formData
-   *         required: false
-   *       - name: countryCode
-   *         description: countryCode
-   *         in: formData
-   *         required: false
-   *       - name: mobileNumber
-   *         description: mobileNumber
-   *         in: formData
-   *         required: false
-   *       - name: city
-   *         description: city
-   *         in: formData
-   *         required: false
-   *       - name: state
-   *         description: state
-   *         in: formData
-   *         required: false
-   *       - name: country
-   *         description: country
-   *         in: formData
-   *         required: false
-   *       - name: profilePic
-   *         description: profilePic
-   *         in: formData
-   *         required: false
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
-
-  async editProfile(req, res, next) {
-    try {
-      let userResult = await findUser({
-        userType: userType.USER,
-        _id: req.userId,
-      });
-      if (!userResult) {
-        throw apiError.notFound(responseMessage.ADMIN_NOT_FOUND);
-      }
-      if (req.body.email && req.body.email != "") {
-        var emailResult = await findUser({
-          email: req.body.email,
-          _id: { $ne: userResult._id },
-          status: { $ne: status.DELETE },
-        });
-        if (emailResult) {
-          throw apiError.conflict(responseMessage.EMAIL_EXIST);
-        }
-      }
-      if (req.body.mobileNumber && req.body.mobileNumber != "") {
-        var mobileResult = await findUser({
-          mobileNumber: req.body.mobileNumber,
-          _id: { $ne: userResult._id },
-          status: { $ne: status.DELETE },
-        });
-        if (mobileResult) {
-          throw apiError.conflict(responseMessage.MOBILE_EXIST);
-        }
-      }
-      var result = await updateUser(
-        { _id: userResult._id },
-        { $set: req.body }
-      );
-      return res.json(new response(result, responseMessage.UPDATE_SUCCESS));
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-
-  /**
-   * @swagger
-   * /user/directIndirectUserList:
-   *   post:
-   *     tags:
-   *       - USER 
-   *     description: directIndirectUserList
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: category
-   *         description: category 
-   *         in: formData
-   *         enum: ["DIRECT", "INDIRECT"]
-   *         required: false
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
-
-  async directIndirectUserList(req, res, next) {
-    const validationSchema = Joi.object({
-      category: Joi.string().optional(),
-    });
-
-    try {
-      let { category, } = await validationSchema.validateAsync(req.body);
-      let userResult = await findUser({
-        _id: req.userId,
-        userType: userType.USER,
-      });
-      if (!userResult) {
-        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
-      }
-      let query = { referredBy: userResult._id, status: status.ACTIVE };
-      if (category) {
-        query.category = category;
-      }
-      const result = await aggregatelistIndirectReferral(query);
-      if (result.length === 0) {
-        throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
-      }
-      return res.json(new response(result, responseMessage.DETAILS_FETCHED));
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-
 }
 
-
-
-
 export default new userController();
-
-

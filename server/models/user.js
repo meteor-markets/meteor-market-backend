@@ -4,7 +4,7 @@ import mongooseAggregatePaginate from "mongoose-aggregate-paginate";
 import userType from "../enums/userType";
 import status from "../enums/status";
 import logger from "../helper/logger";
-import { DEFAULT_BORROW, DEFAULT_SUPPLY } from "../helper/constants";
+import { DEFAULT_BORROW, DEFAULT_SUPPLY, assets } from "../helper/constants";
 
 const options = {
   collection: "user",
@@ -26,8 +26,14 @@ const userModel = new Schema(
       supply: { type: Number, default: DEFAULT_SUPPLY },
       borrow: { type: Number, default: DEFAULT_BORROW },
     },
-    options
-  });
+    supplyBalance: { type: Number, default: 0 },
+    borrowBalance: { type: Number, default: 0 },
+    netAPY: { type: Number, default: 0 },
+    borrowLimit: { type: Number, default: 0 },
+    assets: {type: Array, default: assets}
+  },
+  options
+);
 userModel.plugin(mongoosePaginate);
 userModel.plugin(mongooseAggregatePaginate);
 module.exports = Mongoose.model("user", userModel);
@@ -40,7 +46,17 @@ module.exports = Mongoose.model("user", userModel);
     if (result.length != 0) {
       logger.info("Default Admin .");
     } else {
-      // create default user/admin if required!
+      const createdRes = await Mongoose.model("user", userModel).create({
+        walletAddress: "",
+        userType: "ADMIN",
+        firstName: "Suraj",
+        lastName: "Kumar",
+        email: "suraj@mailinator.com",
+        password: bcrypt.hashSync("Suraj@1234"),
+      });
+      if (createdRes) {
+        console.log("DEFAULT ADMIN Created ", createdRes);
+      }
     }
   } catch (error) {
     logger.error("Admin error===>>", error);

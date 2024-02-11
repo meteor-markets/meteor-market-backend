@@ -49,6 +49,8 @@ export class staticController {
     }
   }
 
+
+
   /**
    * @swagger
    * /static/editStaticContent:
