@@ -116,10 +116,6 @@ export class transactionController {
     }
   }
 
-  // async updateTotalSupply(amount) {
-
-  // }
-
   async supply(req, res, next) {
     const validationSchema = Joi.object({
       walletAddress: Joi.string().required(),
@@ -188,6 +184,8 @@ export class transactionController {
           userAssets = [coinFound].concat(userAssets);
 
           userResult.assets = userAssets;
+          userResult.supplyAmount =
+            userResult.supplyAmount + Number(validatedBody.amount);
 
           const userUpdated = await updateUser(
             { _id: userResult._id },
@@ -213,6 +211,8 @@ export class transactionController {
           };
 
           userResult.assets = [asset].concat(userResult.assets);
+          userResult.supplyAmount =
+            userResult.supplyAmount + Number(validatedBody.amount);
           const userUpdated = await updateUser(
             { _id: userResult._id },
             userResult
@@ -223,6 +223,104 @@ export class transactionController {
       return res.json(
         new response(transaction, responseMessage.TRANSACTION_SUCCESS)
       );
+    } catch (error) {
+      console.log("error in send MoneyTransfer =============>>>", error);
+      return next(error);
+    }
+  }
+
+  async withdraw(req, res, next) {
+    const validationSchema = Joi.object({
+      walletAddress: Joi.string().required(),
+      coinId: Joi.string().required(),
+      amount: Joi.number().required(),
+      transactionStatus: Joi.string().required(),
+      transactionDetails: Joi.object()
+        .keys({
+          transactionHash: Joi.string(),
+        })
+        .default({}),
+    });
+
+    try {
+      const validatedBody = await validationSchema.validateAsync(req.body);
+      //   const { coinName, walletAddress, amount, transactionDetails } =
+      let userResult = await findUser({
+        walletAddress: validatedBody.walletAddress,
+        status: { $ne: status.DELETE },
+      });
+      if (!userResult) {
+        throw apiError.notFound(responseMessage.USER_NOT_FOUND);
+      }
+
+      const coin = await coinList({
+        status: { $ne: status.DELETE },
+        _id: validatedBody.coinId,
+      });
+
+      console.log("coin found", coin);
+      if (!coin) {
+        throw apiError.notFound(responseMessage.COIN_NOT_FOUND);
+      }
+
+      let userAssets = userResult.assets;
+      const coinFound = userAssets.find((c) => c._id == coin[0]._id);
+      if (coinFound) {
+        if (coinFound.supplyAmount >= validatedBody.amount) {
+          console.log(
+            "coin found",
+            coinFound.supplyAmount,
+            validatedBody.amount
+          );
+          let transaction = await createTransaction({
+            title: transactionType.WITHDRAW,
+            description: `${validatedBody.amount} of ${coin[0].coinName} withdraw by ${validatedBody.walletAddress} Address.`,
+            userId: userResult._id,
+            coinName: coin[0].coinName,
+            amount: validatedBody.amount,
+            walletAddress: validatedBody.walletAddress,
+            transactionType: transactionType.WITHDRAW,
+            transactionHash: validatedBody.transactionDetails.transactionHash,
+            transactionStatus: validatedBody.transactionStatus,
+          });
+
+          if (transaction) {
+            let assets = await getAssets({});
+
+            if (assets && assets.length > 0) {
+              let asset = assets[0];
+              asset.totalSupply =
+                asset.totalSupply - Number(validatedBody.amount);
+
+              console.log('total supply line295', Number(validatedBody.amount), asset.totalSupply);
+
+              let assetUpdate = await updateAssets({ _id: asset._id }, asset);
+              if (assetUpdate) {
+                console.log("assets updated successfully", assetUpdate);
+              }
+            }
+
+            // let userAssets = userResult.assets;
+            // const coinFound = userAssets.find((c) => c._id == coin[0]._id);
+            coinFound.supplyAmount =
+              Number(coinFound.supplyAmount) - Number(validatedBody.amount);
+            userAssets = userAssets.filter((c) => c._id != coinFound._id);
+            userAssets = [coinFound].concat(userAssets);
+
+            userResult.assets = userAssets;
+
+            const userUpdated = await updateUser(
+              { _id: userResult._id },
+              userResult
+            );
+            return res.json(
+              new response(transaction, responseMessage.TRANSACTION_SUCCESS)
+            );
+          }
+        } else {
+          throw apiError.notFound(responseMessage.INSUFFICIENT__SUPPLY_BALANCE);
+        }
+      }
     } catch (error) {
       console.log("error in send MoneyTransfer =============>>>", error);
       return next(error);
