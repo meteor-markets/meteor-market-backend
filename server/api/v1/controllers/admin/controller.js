@@ -8,18 +8,16 @@ import commonFunction from "../../../../helper/util";
 import status from "../../../../enums/status";
 import userType from "../../../../enums/userType";
 
-
 // ******************* Importing services *************************************//
 import { userServices } from "../../services/user";
-const { findUser, findUserData, updateUser, updateUserById, paginateSearch } = userServices;
-import { coinServices } from "../../services/coin";
-const { coinList } = coinServices;
-
+const { findUser, findUserData, updateUser, updateUserById, paginateSearch } =
+  userServices;
+import { overviewService } from "../../services/overview";
+const { getAssets } = overviewService;
 
 //******************************************************************************/
 
 export class adminController {
-
   /**
    * @swagger
    * /admin/login:
@@ -48,7 +46,6 @@ export class adminController {
     var validationSchema = Joi.object({
       email: Joi.string().required(),
       password: Joi.string().required(),
-
     });
     try {
       if (req.body.email) {
@@ -87,196 +84,6 @@ export class adminController {
       return next(error);
     }
   }
-
-
-  // /**
-  //  * @swagger
-  //  * /admin/updateAdminProfile:
-  //  *   put:
-  //  *     tags:
-  //  *       - ADMIN
-  //  *     description: updateAdminProfile 
-  //  *     produces:
-  //  *       - application/json
-  //  *     parameters:
-  //  *       - name: token
-  //  *         description: token
-  //  *         in: header
-  //  *         required: true
-  //  *       - name: email
-  //  *         description: email
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: firstName
-  //  *         description: firstName
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: lastName
-  //  *         description: lastName
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: countryCode
-  //  *         description: countryCode
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: mobileNumber
-  //  *         description: mobileNumber
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: state
-  //  *         description: state
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: profilePic
-  //  *         description: profilePic
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: address
-  //  *         description: address
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: city
-  //  *         description: city
-  //  *         in: formData
-  //  *         required: false
-  //  *       - name: country
-  //  *         description: country
-  //  *         in: formData
-  //  *         required: false
-  //  *     responses:
-  //  *       200:
-  //  *         description: Returns success message
-  //  */
-  async updateAdminProfile(req, res, next) {
-    const validationSchema = Joi.object({
-      firstName: Joi.string().allow("").optional(),
-      lastName: Joi.string().allow("").optional(),
-      email: Joi.string().allow("").optional(),
-      countryCode: Joi.string().allow("").optional(),
-      mobileNumber: Joi.string().allow("").optional(),
-      profilePic: Joi.string().allow("").optional(),
-      address: Joi.string().allow("").optional(),
-      city: Joi.string().allow("").optional(),
-      country: Joi.string().allow("").optional(),
-      state: Joi.string().allow("").optional(),
-    });
-    try {
-      if (req.body.email) {
-        req.body.email = req.body.email.toLowerCase();
-      }
-      var updated;
-      let validatedBody = await validationSchema.validateAsync(req.body);
-
-      let adminResult = await findUser({
-        _id: req.userId,
-        status: { $ne: status.DELETE },
-        userType: userType.ADMIN,
-      });
-      if (!adminResult) {
-        throw apiError.notFound(responseMessage.ADMIN_NOT_FOUND);
-      }
-      if (adminResult.email == validatedBody.email) {
-        throw apiError.notFound(responseMessage.EMAIL_EXIST);
-      }
-      if (adminResult.mobileNumber == validatedBody.mobileNumber) {
-        throw apiError.notFound(responseMessage.MOBILE_EXIST);
-      }
-      updated = await updateUser({ _id: adminResult._id }, validatedBody);
-      return res.json(new response(updated, responseMessage.PROFILE_UPDATED));
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-
-  /**
-   * @swagger
-   * /admin/changePassword:
-   *   patch:
-   *     tags:
-   *       - ADMIN
-   *     description: changePassword
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *       - name: oldPassword
-   *         description: oldPassword
-   *         in: formData
-   *         required: true
-   *       - name: newPassword
-   *         description: newPassword
-   *         in: formData
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
-  async changePassword(req, res, next) {
-    const validationSchema = Joi.object({
-      oldPassword: Joi.string().required(),
-      newPassword: Joi.string().required(),
-    });
-    try {
-      let validatedBody = await validationSchema.validateAsync(req.body);
-      let adminResult = await findUser({
-        _id: req.userId,
-        status: { $ne: status.DELETE },
-      });
-      if (!adminResult) {
-        throw apiError.notFound(responseMessage.ADMIN_NOT_FOUND);
-      }
-      if (
-        !bcrypt.compareSync(validatedBody.oldPassword, adminResult.password)
-      ) {
-        throw apiError.badRequest(responseMessage.PWD_NOT_MATCH);
-      }
-      let updated = await updateUserById(adminResult._id, {
-        password: bcrypt.hashSync(validatedBody.newPassword),
-      });
-      return res.json(new response(updated, responseMessage.PWD_CHANGED));
-    } catch (error) {
-      return next(error);
-    }
-  }
-
-
-  /**
-   * @swagger
-   * /admin/adminProfile:
-   *   get:
-   *     tags:
-   *       - ADMIN
-   *     description: get his own profile details with adminProfile API
-   *     produces:
-   *       - application/json
-   *     parameters:
-   *       - name: token
-   *         description: token
-   *         in: header
-   *         required: true
-   *     responses:
-   *       200:
-   *         description: Returns success message
-   */
-  async adminProfile(req, res, next) {
-    try {
-      let adminResult = await findUser({
-        _id: req.userId,
-        status: { $ne: status.DELETE },
-      });
-      if (!adminResult) {
-        throw apiError.notFound(responseMessage.ADMIN_NOT_FOUND);
-      }
-      return res.json(new response(adminResult, responseMessage.USER_DETAILS));
-    } catch (error) {
-      return next(error);
-    }
-  }
-
 
   /**
    * @swagger
@@ -326,7 +133,7 @@ export class adminController {
     }
   }
 
-// [FIX]
+  // [FIX]
   /**
    * @swagger
    * /admin/deleteUser:
@@ -379,7 +186,6 @@ export class adminController {
       return next(error);
     }
   }
-
 
   /**
    * @swagger
@@ -444,14 +250,13 @@ export class adminController {
     }
   }
 
-
   /**
    * @swagger
    * /admin/listUser:
    *   get:
    *     tags:
    *       - ADMIN_USER_MANAGEMENT
-   *     description: List of all USER 
+   *     description: List of all USER
    *     produces:
    *       - application/json
    *     parameters:
@@ -518,21 +323,19 @@ export class adminController {
     }
   }
 
-
-
   /**
-  * @swagger
-  * /admin/listCoin:
-  *   get:
-  *     tags:
-  *       - COIN
-  *     description: listCoin 
-  *     produces:
-  *       - application/json
-  *     responses:
-  *       200:
-  *         description: Returns success message
-  */
+   * @swagger
+   * /admin/listCoin:
+   *   get:
+   *     tags:
+   *       - COIN
+   *     description: listCoin
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Returns success message
+   */
   async listCoin(req, res, next) {
     try {
       let coinResult = await coinList({ status: { $ne: status.DELETE } });
@@ -540,6 +343,19 @@ export class adminController {
         throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
       } else {
         return res.json(new response(coinResult, responseMessage.DATA_FOUND));
+      }
+    } catch (error) {
+      return next(error);
+    }
+  }
+
+  async overview(req, res, next) {
+    try {
+      let overview = await getAssets({});
+      if (overview.length <= 0) {
+        throw apiError.notFound(responseMessage.DATA_NOT_FOUND);
+      } else {
+        return res.json(new response(overview, responseMessage.DATA_FOUND));
       }
     } catch (error) {
       return next(error);

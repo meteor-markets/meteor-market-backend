@@ -32,6 +32,9 @@ const {
 import { coinServices } from "../../services/coin";
 const { coinList } = coinServices;
 
+import { overviewService } from "../../services/overview";
+const { getAssets, updateAssets } = overviewService;
+
 export class transactionController {
   /**
    * @swagger
@@ -113,6 +116,10 @@ export class transactionController {
     }
   }
 
+  // async updateTotalSupply(amount) {
+
+  // }
+
   async supply(req, res, next) {
     const validationSchema = Joi.object({
       walletAddress: Joi.string().required(),
@@ -160,6 +167,18 @@ export class transactionController {
       });
 
       if (transaction) {
+        let assets = await getAssets({});
+
+        if (assets && assets.length > 0) {
+          let asset = assets[0];
+          asset.totalSupply = asset.totalSupply + +validatedBody.amount;
+
+          let assetUpdate = await updateAssets({ _id: asset._id }, asset);
+          if (assetUpdate) {
+            console.log("assets updated successfully", assetUpdate);
+          }
+        }
+
         let userAssets = userResult.assets;
         const coinFound = userAssets.find((c) => c._id == coin[0]._id);
         if (coinFound) {
