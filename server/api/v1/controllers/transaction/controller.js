@@ -129,7 +129,6 @@ export class transactionController {
     try {
       const validatedBody = await validationSchema.validateAsync(req.body);
       //   const { coinName, walletAddress, amount, transactionDetails } =
-      console.log("validation body", validatedBody);
       let userResult = await findUser({
         walletAddress: validatedBody.walletAddress,
         status: { $ne: status.DELETE },
@@ -137,8 +136,6 @@ export class transactionController {
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
-
-      console.log("user found", userResult);
 
       const coin = await coinList({
         status: { $ne: status.DELETE },
@@ -149,12 +146,6 @@ export class transactionController {
       if (!coin) {
         throw apiError.notFound(responseMessage.COIN_NOT_FOUND);
       }
-
-      // let feeSettingRes = await findFeeSetting({ coinType: coinName });
-      // let adminFees = (parseFloat(amount) * feeSettingRes.withdrawFee) / 100;
-      // if (Number(feeSettingRes.minWithdraw) > Number(amount) && Number(feeSettingRes.maxWithdraw) > Number(amount)) {
-      //     throw apiError.notFound(responseMessage.PRICE_BETWEEN_MIN_MAX);
-      // }
 
       let transaction = await createTransaction({
         title: transactionType.SUPPLY,
@@ -168,27 +159,21 @@ export class transactionController {
         transactionStatus: validatedBody.transactionStatus,
       });
 
-      console.log("transaction response", transaction);
       if (transaction) {
         let userAssets = userResult.assets;
-        console.log("userAssets", userAssets);
         const coinFound = userAssets.find((c) => c._id == coin[0]._id);
-        console.log("user profile assets", coinFound);
         if (coinFound) {
           coinFound.supplyAmount =
             parseInt(coinFound.supplyAmount) + validatedBody.amount;
           userAssets = userAssets.filter((c) => c._id != coinFound._id);
           userAssets = [coinFound].concat(userAssets);
 
-          console.log("updated user assets", userAssets);
           userResult.assets = userAssets;
-          console.log("updated user line181", userResult);
+
           const userUpdated = await updateUser(
             { _id: userResult._id },
             userResult
           );
-
-          console.log("user updated line187", userUpdated);
         } else {
           let asset = {
             _id: validatedBody.coinId,
@@ -213,8 +198,6 @@ export class transactionController {
             { _id: userResult._id },
             userResult
           );
-
-          console.log("user updated line217", userUpdated);
         }
       }
 
