@@ -14,6 +14,8 @@ const { findUser, findUserData, updateUser, updateUserById, paginateSearch } =
   userServices;
 import { overviewService } from "../../services/overview";
 const { getAssets } = overviewService;
+import { coinServices } from "../../services/coin";
+const { coinList } = coinServices;
 
 //******************************************************************************/
 
