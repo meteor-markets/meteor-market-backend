@@ -55,6 +55,7 @@ coinSchema.plugin(mongooseAggregatePaginate);
 module.exports = Mongoose.model("coin", coinSchema);
 
 (async () => {
+  // let result = await Mongoose.model("coin", coinSchema).find({}).deleteMany();
   let result = await Mongoose.model("coin", coinSchema).find({});
   if (result.length != 0) {
     logger.info("Default coin content already created.");

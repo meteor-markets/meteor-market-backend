@@ -152,6 +152,7 @@ export class userController {
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
+      userResult.assets = assets;
       return res.json(new response(userResult, responseMessage.USER_DETAILS));
     } catch (error) {
       return next(error);
