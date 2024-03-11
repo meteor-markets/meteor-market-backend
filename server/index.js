@@ -1,4 +1,3 @@
-// import Config from "config";
 import Config from "../config/staging.json";
 import Routes from "./routes";
 import Server from "./common/server";

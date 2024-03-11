@@ -11,15 +11,5 @@ export default Express.Router()
 
   .use(auth.verifyToken)
 
-  // **********************ADMIN************************/
-  // .patch("/changePassword", controller.changePassword)
-  // .get("/adminProfile", controller.adminProfile)
-
-  // ************ADMIN USER NAMAGEMENT***********************/
-  // .get("/viewUser", controller.viewUser)
-  // .delete("/deleteUser", controller.deleteUser)
-  // .put("/blockUnblockUser", controller.blockUnblockUser)
-  // .get("/listUser", controller.listUser)
-  // .put("/updateAdminProfile", controller.updateAdminProfile)
-
+  
   .use(upload.uploadFile);

@@ -59,8 +59,8 @@ class ExpressServer {
   async configureDb(dbUrl) {
     try {
       await mongoose.connect(dbUrl, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+        // useNewUrlParser: true,
+        // useUnifiedTopology: true,
       });
       logger.info('MongoDB connection established');
       return this;

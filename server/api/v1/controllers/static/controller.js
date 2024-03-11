@@ -1,6 +1,5 @@
 import Joi from "joi";
 import _ from "lodash";
-import config from "config";
 import apiError from '../../../../helper/apiError';
 import userType from '../../../../enums/userType';
 import response from '../../../../../assets/response';

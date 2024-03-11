@@ -1,6 +1,5 @@
 import Joi from "joi";
 import _ from "lodash";
-import config from "config";
 import moment from "moment";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

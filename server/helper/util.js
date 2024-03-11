@@ -1,5 +1,4 @@
 import config from "../../config/staging.json";
-// import config from "config";
 import jwt from 'jsonwebtoken';
 import cloudinary from "cloudinary";
 

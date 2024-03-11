@@ -1,4 +1,3 @@
-// import config from "config";
 import config from "../../config/staging.json";
 import jwt from "jsonwebtoken";
 import userModel from "../models/user";
