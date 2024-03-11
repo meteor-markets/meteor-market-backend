@@ -38,27 +38,4 @@ userModel.plugin(mongoosePaginate);
 userModel.plugin(mongooseAggregatePaginate);
 module.exports = Mongoose.model("user", userModel);
 
-(async () => {
-  try {
-    const result = await Mongoose.model("user", userModel).find({
-      userType: userType.ADMIN,
-    });
-    if (result.length != 0) {
-      logger.info("Default Admin .");
-    } else {
-      const createdRes = await Mongoose.model("user", userModel).create({
-        walletAddress: "",
-        userType: "ADMIN",
-        firstName: "Suraj",
-        lastName: "Kumar",
-        email: "suraj@mailinator.com",
-        password: bcrypt.hashSync("Suraj@1234"),
-      });
-      if (createdRes) {
-        console.log("DEFAULT ADMIN Created ", createdRes);
-      }
-    }
-  } catch (error) {
-    logger.error("Admin error===>>", error);
-  }
-}).call();
+

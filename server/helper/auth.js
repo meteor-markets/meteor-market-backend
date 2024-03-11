@@ -1,4 +1,4 @@
-import config from "../../config/staging.json";
+import config from "../../config/index.js";
 import jwt from "jsonwebtoken";
 import userModel from "../models/user";
 import apiError from './apiError';

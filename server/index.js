@@ -1,6 +1,7 @@
-import Config from "../config/staging.json";
+import Config from "../config/index.js";
 import Routes from "./routes";
 import Server from "./common/server";
+
 // const dbUrl = `mongodb://${Config.get('databaseHost')}:${Config.get("databasePort")}/${Config.get("databaseName")}`;
 const dbUrl = Config.mongodbString;
 const server = new Server()
