@@ -6,7 +6,6 @@ class apiError extends Error {
 		this.responseCode = responseCode;
 		this.responseMessage = responseMessage ? responseMessage : error[responseCode] || 'internal server error';
 		this.isApiError = true;
-		// console.log("9======", this.responseMessage,this.responseCode);
 	}
 
 	static unauthorized(msg) {

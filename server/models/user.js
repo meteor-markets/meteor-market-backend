@@ -16,7 +16,7 @@ const userModel = new Schema(
     walletAddress: { type: String },
     userType: {
       type: String,
-      enum: [userType.ADMIN, userType.USER],
+      enum: [userType.USER],
       default: userType.USER,
     },
     status: {

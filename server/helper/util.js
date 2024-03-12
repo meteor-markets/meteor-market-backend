@@ -13,12 +13,6 @@ cloudinary.config({
 
 module.exports = {
 
-  getOTP() {
-    var otp = Math.floor(100000 + Math.random() * 900000);
-    return otp;
-  },
-
-
   getToken: async (payload) => {
     var token = await jwt.sign(payload, config.jwtsecret, { expiresIn: "24h" })
     return token;
@@ -31,16 +25,5 @@ module.exports = {
     return result.secure_url;
   },
 
-  generateReferralCode: async (length) => {
-    const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    const codeLength = length || 8;
-    let referralCode = "";
-    for (let i = 0; i < codeLength; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      referralCode += characters.charAt(randomIndex);
-    }
-    return referralCode;
-  },
 
 }

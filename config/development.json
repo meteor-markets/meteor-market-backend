@@ -1,34 +1,33 @@
 {
-    "port": 2021,
-    "hostAddress": "localhost",
-    "databaseHost": "localhost",
-    "mongodbString": "mongodb+srv://user1:SRJFk5FGvbIt5fRn@cluster0.nqteukx.mongodb.net/DefiProject?retryWrites=true&w=majority",
-    "databasePort": "27017",
-    "databaseName": "Defi-Project",
-    "jwtsecret": "nodejwt",
-    "jwtresetsecret": "nodejwt",
-    "jwtOptions": {
-      "expiresIn": "24h"
+  "port": 2021,
+  "hostAddress": "localhost",
+  "databaseHost": "localhost",
+  "mongodbString": "mongodb+srv://user1:SRJFk5FGvbIt5fRn@cluster0.nqteukx.mongodb.net/DefiProject?retryWrites=true&w=majority",
+  "databasePort": "27017",
+  "databaseName": "Defi-Project",
+  "jwtsecret": "nodejwt",
+  "jwtresetsecret": "nodejwt",
+  "jwtOptions": {
+    "expiresIn": "24h"
+  },
+  "swaggerDefinition": {
+    "info": {
+      "title": "Defi Project",
+      "version": "2.0",
+      "description": "Defi Project - API Docs"
     },
-    "swaggerDefinition": {
-      "info": {
-        "title": "Defi Project",
-        "version": "2.0",
-        "description": "Defi Project - API Docs"
-      },
-      "basePath": "/api/v1",
-      "securityDefinitions": {
-        "tokenauth": {
-          "type": "apiKey",
-          "name": "Authorization",
-          "in": "header"
-        }
+    "basePath": "/api/v1",
+    "securityDefinitions": {
+      "tokenauth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
       }
-    },
-  
-    "cloudinary": {
-      "cloud_name": "dfd7lapgy",
-      "api_key": "441998725238634",
-      "api_secret": "FQzfC-rGhhS2SbQvMu_2m51nDp0"
     }
+  },
+  "cloudinary": {
+    "cloud_name": "dfd7lapgy",
+    "api_key": "441998725238634",
+    "api_secret": "FQzfC-rGhhS2SbQvMu_2m51nDp0"
   }
+}
