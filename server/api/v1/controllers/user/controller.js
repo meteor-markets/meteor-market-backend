@@ -144,6 +144,29 @@ export class userController {
     }
   }
 
+  /**
+   * @swagger
+   * /user/getPortfolio:
+   *   get:
+   *     tags:
+   *       - USER
+   *     description: getPortfolio
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: token
+   *         in: header
+   *         required: true
+   *       - name: walletAddress
+   *         description: walletAddress
+   *         in: query
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Return success message
+   */
+
   async getPortfolio(req, res, next) {
     const validationSchema = Joi.object({
       walletAddress: Joi.string().required(),
@@ -151,12 +174,8 @@ export class userController {
 
     try {
       const validatedBody = await validationSchema.validateAsync(req.query);
-
-      console.log("validate body", validatedBody);
-
-      console.log("portfolio params", req.query);
       let userResult = await findUser({
-        walletAddress: req.query.walletAddress,
+        walletAddress: validatedBody.walletAddress,
         status: { $ne: status.DELETE },
       });
 
@@ -169,12 +188,12 @@ export class userController {
     }
   }
 
-  /**
+/**
  * @swagger
- * /transaction/transactionList:
+ * /user/transactionList:
  *   get:
  *     tags:
- *       - USER TRANSACTION MANAGEMENT
+ *       - USER
  *     description: transactionList
  *     produces:
  *       - application/json
@@ -249,6 +268,45 @@ export class userController {
     }
   }
 
+  /**
+   * @swagger
+   * /user/supply:
+   *   post:
+   *     tags:
+   *       - USER
+   *     description: Supply 
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: User token
+   *         in: header
+   *         required: true
+   *       - name: walletAddress
+   *         description: User walletAddress
+   *         in: formData
+   *         required: true
+   *       - name: coinId
+   *         description: coinId
+   *         in: formData
+   *         required: true
+   *       - name: amount
+   *         description: amount
+   *         in: formData
+   *         required: true
+   *       - name: transactionStatus
+   *         description: transactionStatus
+   *         in: formData
+   *         required: true
+   *       - name: transactionDetails
+   *         description: transactionDetails
+   *         in: object
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Returns success message
+   */
+
   async supply(req, res, next) {
     const validationSchema = Joi.object({
       walletAddress: Joi.string().required(),
@@ -264,7 +322,6 @@ export class userController {
 
     try {
       const validatedBody = await validationSchema.validateAsync(req.body);
-      //   const { coinName, walletAddress, amount, transactionDetails } =
       let userResult = await findUser({
         walletAddress: validatedBody.walletAddress,
         status: { $ne: status.DELETE },
@@ -362,6 +419,47 @@ export class userController {
     }
   }
 
+  
+
+  /**
+   * @swagger
+   * /user/withdraw:
+   *   post:
+   *     tags:
+   *       - USER
+   *     description: withdraw 
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: User token
+   *         in: header
+   *         required: true
+   *       - name: walletAddress
+   *         description: User walletAddress
+   *         in: formData
+   *         required: true
+   *       - name: coinId
+   *         description: coinId
+   *         in: formData
+   *         required: true
+   *       - name: amount
+   *         description: amount
+   *         in: formData
+   *         required: true
+   *       - name: transactionStatus
+   *         description: transactionStatus
+   *         in: formData
+   *         required: true
+   *       - name: transactionDetails
+   *         description: transactionDetails
+   *         in: object
+   *         required: true
+   *     responses:
+   *       200:
+   *         description: Returns success message
+   */
+
   async withdraw(req, res, next) {
     const validationSchema = Joi.object({
       walletAddress: Joi.string().required(),
@@ -377,7 +475,6 @@ export class userController {
 
     try {
       const validatedBody = await validationSchema.validateAsync(req.body);
-      //   const { coinName, walletAddress, amount, transactionDetails } =
       let userResult = await findUser({
         walletAddress: validatedBody.walletAddress,
         status: { $ne: status.DELETE },
@@ -464,7 +561,7 @@ export class userController {
 
   /**
    * @swagger
-   * /admin/listCoin:
+   * /user/listCoin:
    *   get:
    *     tags:
    *       - COIN
@@ -488,6 +585,19 @@ export class userController {
     }
   }
 
+  /**
+   * @swagger
+   * /user/overview:
+   *   get:
+   *     tags:
+   *       - USER
+   *     description: overview
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       200:
+   *         description: Returns success message
+   */
   async overview(req, res, next) {
     try {
       let overview = await getAssets({});
