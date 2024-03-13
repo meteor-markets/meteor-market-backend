@@ -8,7 +8,7 @@ import status from "../../../../enums/status";
 import transactionStatus from "../../../../enums/transactionStatus";
 import transactionType from "../../../../enums/transactionType";
 import coinType from "../../../../enums/coinType";
-
+import userType from "../../../../enums/userType";
 
 //*********************************** Import Services ************************/
 import { userServices } from "../../services/user";
@@ -188,56 +188,56 @@ export class userController {
     }
   }
 
-/**
- * @swagger
- * /user/transactionList:
- *   get:
- *     tags:
- *       - USER
- *     description: transactionList
- *     produces:
- *       - application/json
- *     parameters:
- *       - name: token
- *         description: token
- *         in: header
- *         required: true
- *       - name: search
- *         description: search
- *         in: query
- *         required: false
- *       - name: transactionType
- *         description: transactionType ??  WITHDRAW, DEPOSIT
- *         enum: ["WITHDRAW", "SUPPLY", "BORROW", "REPAY"]
- *         in: query
- *         required: false
- *       - name: transactionStatus
- *         description: transactionStatus ?? Pending, Failed, Success,
- *         enum: ["PENDING", "SUCCESS", "FAILED"]
- *         in: query
- *         required: false
- *       - name: fromDate
- *         description: fromDate
- *         in: query
- *         required: false
- *       - name: toDate
- *         description: toDate
- *         in: query
- *         required: false
- *       - name: page
- *         description: page
- *         in: query
- *         type: integer
- *         required: false
- *       - name: limit
- *         description: limit
- *         in: query
- *         type: integer
- *         required: false
- *     responses:
- *       200:
- *         description: Returns success message
- */
+  /**
+   * @swagger
+   * /user/transactionList:
+   *   get:
+   *     tags:
+   *       - USER
+   *     description: transactionList
+   *     produces:
+   *       - application/json
+   *     parameters:
+   *       - name: token
+   *         description: token
+   *         in: header
+   *         required: true
+   *       - name: search
+   *         description: search
+   *         in: query
+   *         required: false
+   *       - name: transactionType
+   *         description: transactionType ??  WITHDRAW, DEPOSIT
+   *         enum: ["WITHDRAW", "SUPPLY", "BORROW", "REPAY"]
+   *         in: query
+   *         required: false
+   *       - name: transactionStatus
+   *         description: transactionStatus ?? Pending, Failed, Success,
+   *         enum: ["PENDING", "SUCCESS", "FAILED"]
+   *         in: query
+   *         required: false
+   *       - name: fromDate
+   *         description: fromDate
+   *         in: query
+   *         required: false
+   *       - name: toDate
+   *         description: toDate
+   *         in: query
+   *         required: false
+   *       - name: page
+   *         description: page
+   *         in: query
+   *         type: integer
+   *         required: false
+   *       - name: limit
+   *         description: limit
+   *         in: query
+   *         type: integer
+   *         required: false
+   *     responses:
+   *       200:
+   *         description: Returns success message
+   */
   async transactionList(req, res, next) {
     const validationSchema = Joi.object({
       search: Joi.string().optional(),
@@ -298,9 +298,9 @@ export class userController {
    *         description: transactionStatus
    *         in: formData
    *         required: true
-   *       - name: transactionDetails
-   *         description: transactionDetails
-   *         in: object
+   *       - name: transactionHash
+   *         description: transactionHash
+   *         in: formData
    *         required: true
    *     responses:
    *       200:
@@ -313,29 +313,18 @@ export class userController {
       coinId: Joi.string().required(),
       amount: Joi.number().required(),
       transactionStatus: Joi.string().required(),
-      transactionDetails: Joi.object()
-        .keys({
-          transactionHash: Joi.string(),
-        })
-        .default({}),
+      transactionHash: Joi.string().required(),
     });
 
     try {
       const validatedBody = await validationSchema.validateAsync(req.body);
-      let userResult = await findUser({
-        walletAddress: validatedBody.walletAddress,
-        status: { $ne: status.DELETE },
-      });
+      let userResult = await findUser({ _id: req.userId, status: { $ne: status.DELETE }, });
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
 
-      const coin = await coinList({
-        status: { $ne: status.DELETE },
-        _id: validatedBody.coinId,
-      });
+      const coin = await coinList({ status: { $ne: status.DELETE }, _id: validatedBody.coinId, });
 
-      console.log("coin found", coin);
       if (!coin) {
         throw apiError.notFound(responseMessage.COIN_NOT_FOUND);
       }
@@ -348,7 +337,7 @@ export class userController {
         amount: validatedBody.amount,
         walletAddress: validatedBody.walletAddress,
         transactionType: transactionType.SUPPLY,
-        transactionHash: validatedBody.transactionDetails.transactionHash,
+        transactionHash: validatedBody.transactionHash,
         transactionStatus: validatedBody.transactionStatus,
       });
 
@@ -357,7 +346,7 @@ export class userController {
 
         if (assets && assets.length > 0) {
           let asset = assets[0];
-          asset.totalSupply = asset.totalSupply + +validatedBody.amount;
+          asset.totalSupply = asset.totalSupply + validatedBody.amount;
 
           let assetUpdate = await updateAssets({ _id: asset._id }, asset);
           if (assetUpdate) {
@@ -368,19 +357,14 @@ export class userController {
         let userAssets = userResult.assets;
         const coinFound = userAssets.find((c) => c._id == coin[0]._id);
         if (coinFound) {
-          coinFound.supplyAmount =
-            parseInt(coinFound.supplyAmount) + validatedBody.amount;
+          coinFound.supplyAmount = parseInt(coinFound.supplyAmount) + validatedBody.amount;
           userAssets = userAssets.filter((c) => c._id != coinFound._id);
           userAssets = [coinFound].concat(userAssets);
 
           userResult.assets = userAssets;
-          userResult.supplyAmount =
-            userResult.supplyAmount + Number(validatedBody.amount);
+          userResult.supplyAmount = userResult.supplyAmount + Number(validatedBody.amount);
 
-          const userUpdated = await updateUser(
-            { _id: userResult._id },
-            userResult
-          );
+          const userUpdated = await updateUser({ _id: userResult._id }, userResult);
         } else {
           let asset = {
             _id: validatedBody.coinId,
@@ -401,25 +385,18 @@ export class userController {
           };
 
           userResult.assets = [asset].concat(userResult.assets);
-          userResult.supplyAmount =
-            userResult.supplyAmount + Number(validatedBody.amount);
-          const userUpdated = await updateUser(
-            { _id: userResult._id },
-            userResult
-          );
+          userResult.supplyAmount = userResult.supplyAmount + Number(validatedBody.amount);
+          const userUpdated = await updateUser({ _id: userResult._id }, userResult);
         }
       }
 
-      return res.json(
-        new response(transaction, responseMessage.TRANSACTION_SUCCESS)
-      );
+      return res.json(new response(transaction, responseMessage.TRANSACTION_SUCCESS));
     } catch (error) {
-      console.log("error in send MoneyTransfer =============>>>", error);
       return next(error);
     }
   }
 
-  
+
 
   /**
    * @swagger
@@ -451,9 +428,9 @@ export class userController {
    *         description: transactionStatus
    *         in: formData
    *         required: true
-   *       - name: transactionDetails
-   *         description: transactionDetails
-   *         in: object
+   *       - name: transactionHash
+   *         description: transactionHash
+   *         in: formData
    *         required: true
    *     responses:
    *       200:
@@ -466,29 +443,18 @@ export class userController {
       coinId: Joi.string().required(),
       amount: Joi.number().required(),
       transactionStatus: Joi.string().required(),
-      transactionDetails: Joi.object()
-        .keys({
-          transactionHash: Joi.string(),
-        })
-        .default({}),
+      transactionHash: Joi.string().required(),
     });
 
     try {
       const validatedBody = await validationSchema.validateAsync(req.body);
-      let userResult = await findUser({
-        walletAddress: validatedBody.walletAddress,
-        status: { $ne: status.DELETE },
-      });
+      let userResult = await findUser({ _id: req.userId, status: { $ne: status.DELETE }, });
       if (!userResult) {
         throw apiError.notFound(responseMessage.USER_NOT_FOUND);
       }
 
-      const coin = await coinList({
-        status: { $ne: status.DELETE },
-        _id: validatedBody.coinId,
-      });
+      const coin = await coinList({ status: { $ne: status.DELETE }, _id: validatedBody.coinId, });
 
-      console.log("coin found", coin);
       if (!coin) {
         throw apiError.notFound(responseMessage.COIN_NOT_FOUND);
       }
@@ -497,11 +463,7 @@ export class userController {
       const coinFound = userAssets.find((c) => c._id == coin[0]._id);
       if (coinFound) {
         if (coinFound.supplyAmount >= validatedBody.amount) {
-          console.log(
-            "coin found",
-            coinFound.supplyAmount,
-            validatedBody.amount
-          );
+
           let transaction = await createTransaction({
             title: transactionType.WITHDRAW,
             description: `${validatedBody.amount} of ${coin[0].coinName} withdraw by ${validatedBody.walletAddress} Address.`,
@@ -510,7 +472,7 @@ export class userController {
             amount: validatedBody.amount,
             walletAddress: validatedBody.walletAddress,
             transactionType: transactionType.WITHDRAW,
-            transactionHash: validatedBody.transactionDetails.transactionHash,
+            transactionHash: validatedBody.transactionHash,
             transactionStatus: validatedBody.transactionStatus,
           });
 
@@ -519,10 +481,7 @@ export class userController {
 
             if (assets && assets.length > 0) {
               let asset = assets[0];
-              asset.totalSupply =
-                asset.totalSupply - Number(validatedBody.amount);
-
-              console.log('total supply line295', Number(validatedBody.amount), asset.totalSupply);
+              asset.totalSupply = asset.totalSupply - Number(validatedBody.amount);
 
               let assetUpdate = await updateAssets({ _id: asset._id }, asset);
               if (assetUpdate) {
@@ -532,27 +491,20 @@ export class userController {
 
             // let userAssets = userResult.assets;
             // const coinFound = userAssets.find((c) => c._id == coin[0]._id);
-            coinFound.supplyAmount =
-              Number(coinFound.supplyAmount) - Number(validatedBody.amount);
+            coinFound.supplyAmount = Number(coinFound.supplyAmount) - Number(validatedBody.amount);
             userAssets = userAssets.filter((c) => c._id != coinFound._id);
             userAssets = [coinFound].concat(userAssets);
 
             userResult.assets = userAssets;
 
-            const userUpdated = await updateUser(
-              { _id: userResult._id },
-              userResult
-            );
-            return res.json(
-              new response(transaction, responseMessage.TRANSACTION_SUCCESS)
-            );
+            const userUpdated = await updateUser({ _id: userResult._id }, userResult);
+            return res.json(new response(transaction, responseMessage.TRANSACTION_SUCCESS));
           }
         } else {
           throw apiError.notFound(responseMessage.INSUFFICIENT__SUPPLY_BALANCE);
         }
       }
     } catch (error) {
-      console.log("error in send MoneyTransfer =============>>>", error);
       return next(error);
     }
   }
