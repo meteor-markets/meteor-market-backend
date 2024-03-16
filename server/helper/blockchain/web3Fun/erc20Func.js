@@ -3,8 +3,7 @@ import bip39 from 'bip39';
 import { hdkey } from 'ethereumjs-wallet';
 import ethers from 'ethers';
 
-const web3 = new Web3(new Web3.providers.HttpProvider("https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161"));
-// const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161")); //mainnet
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.blast.io"));
 
 const  contractABI  = require("./constant/erc20ABI.json");
 

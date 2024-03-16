@@ -1,28 +1,27 @@
-import axios from 'axios';
-import bip39 from 'bip39';
-import Web3 from 'web3';
-import EthereumTx from 'ethereumjs-tx';
-import Common from 'ethereumjs-common';
-import { hdkey } from 'ethereumjs-wallet';
+import axios from "axios";
+import bip39 from "bip39";
+import Web3 from "web3";
+import EthereumTx from "ethereumjs-tx";
+import Common from "ethereumjs-common";
+import { hdkey } from "ethereumjs-wallet";
+import { blast } from "./constant/constant"
 
-const BNB_URL = 'https://data-seed-prebsc-1-s1.binance.org:8545/'; // testnet
-// const BNB_URL = 'https://bsc-dataseed.binance.org/'; // mainet
+const web3 = new Web3(new Web3.providers.HttpProvider("https://sepolia.blast.io"));
 
-const web3 = new Web3(new Web3.providers.HttpProvider(BNB_URL));
-
-const getCurrentGasPrices = async () => {
+const getCurrentGasPrices = async (gasFee) => {
   try {
-    const apiKey = 'QGYRYI2PU2KI1KDN6T4I5GZ5RQUZ16RSPT';
-    const apiUrl = `https://api.etherscan.io/api?module=gastracker&action=gasestimate&gasprice=gasoracle&apikey=${apiKey}`;
+    const apiKey = ethereum.apiKey;
+    const apiUrl = ethereum.apiUrl;
     const response = await axios.get(apiUrl);
     console.log(response.data);
-    return response.data;
+    gasFee = response.data;
+    return (gasFee);
   } catch (error) {
     console.error(error);
   }
 };
 
-const EthHelper = async () => {
+const ethHelper = async () => {
   let currentGasPrice = await getCurrentGasPrices();
   let gasPrice = 10 * 1000000000;
   let gasLimit = 21000;
@@ -42,7 +41,7 @@ const accountBalance = async (senderAddress) => {
 };
 
 const preTransfer = async (senderAddress, amountToSend) => {
-  const { fee } = await EthHelper();
+  const { fee } = await ethHelper();
   let balance = await accountBalance(senderAddress);
   if (balance - amountToSend - fee < 0) {
     console.log('insufficient funds', balance);
@@ -55,13 +54,19 @@ const preTransfer = async (senderAddress, amountToSend) => {
 const generateMnemonic = () => {
   try {
     let mnemonic = bip39.generateMnemonic();
-    return { responseCode: 200, responseMessage: "Generated.", responseResult: mnemonic };
+    return {
+      responseCode: 200,
+      responseMessage: "Generated.",
+      responseResult: mnemonic,
+    };
   } catch (error) {
-    console.log(error);
-    return { responseCode: 501, responseMessage: "Something went wrong!!!", responseResult: `${error}` };
+    return {
+      responseCode: 501,
+      responseMessage: "Something went wrong",
+      responseResult: error.message,
+    };
   }
 };
-
 
 const getBalance = async (address) => {
   try {
@@ -77,10 +82,10 @@ const getBalance = async (address) => {
 const transfer = async (senderAddress, recieverAddress, privateKey) => {
   try {
     var nonce = await web3.eth.getTransactionCount(senderAddress);
-    const { fee, gasPrice } = await EthHelper();
+    const { fee, gasPrice } = await ethHelper();
     let balance = await accountBalance(senderAddress);
     let amountToSend = balance - fee;
-    if (amountToSend > 0) {
+    if (amountToSend >= 0) {
       let txObject = {
         "to": recieverAddress,
         "value": web3.utils.toHex(
@@ -94,13 +99,11 @@ const transfer = async (senderAddress, recieverAddress, privateKey) => {
       const common = Common.default.forCustomChain(
         "mainnet",
         {
-          name: 'bnb',
-          networkId: '0x61', // testnet
-          chainId: '0x61', // testnet
-          // chainId: '0x38', // mainet
-          // networkId: '0x38', // mainet
+          name: "BLAST",
+          networkId: "0xA0C71FD", //testnet
+          chainId: "0xA0C71FD", //testnet
         },
-        "petersburg"
+        "petersburg",
       );
       const transaction = new EthereumTx(txObject, { common: common });
       let privKey = Buffer.from(privateKey, 'hex');
@@ -120,10 +123,10 @@ const transfer = async (senderAddress, recieverAddress, privateKey) => {
   }
 };
 
-const bnbWithdraw = async (senderAddress, recieverAddress, privateKey, amountToSend) => {
+const withdraw = async (senderAddress, recieverAddress, amountToSend, privateKey) => {
   try {
     var nonce = await web3.eth.getTransactionCount(senderAddress);
-    const { gasPrice } = await EthHelper();
+    const { gasPrice } = await ethHelper();
     const { status } = await preTransfer(senderAddress, amountToSend);
 
     if (status == false) {
@@ -143,11 +146,9 @@ const bnbWithdraw = async (senderAddress, recieverAddress, privateKey, amountToS
     const common = Common.default.forCustomChain(
       "mainnet",
       {
-        name: 'bnb',
-        networkId: '0x61', // testnet
-        chainId: '0x61', // testnet
-        // chainId: '0x38', // mainet
-        // networkId: '0x38', // mainet
+        name: "BLAST",
+        networkId: "0xA0C71FD", //testnet
+        chainId: "0xA0C71FD", //testnet
       },
       "petersburg"
     );
@@ -162,6 +163,7 @@ const bnbWithdraw = async (senderAddress, recieverAddress, privateKey, amountToS
       Status: "Success",
       Hash: signTransaction.transactionHash,
     });
+
     return { responseCode: 200, responseMessage: "Withdraw successful.", responseResult: signTransaction };
   } catch (error) {
     console.log(error);
@@ -169,4 +171,72 @@ const bnbWithdraw = async (senderAddress, recieverAddress, privateKey, amountToS
   }
 };
 
-export { generateMnemonic, getBalance, transfer, bnbWithdraw };
+const getPrice = async (ids, vs_currencies) => {
+  try {
+    console.log("ids==>>", ids);
+    console.log("vs_currencies==>>", vs_currencies);
+    const responseData = await axios.get(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=${vs_currencies}`
+    );
+    console.log("result==>>", responseData.data);
+    return responseData.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const getMarketPrice = async () => {
+  try {
+    const responseData = await axios.get(
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,tether,tron&order=market_cap_desc&price_change_percentage=1h%2C24h`
+    );
+    console.log("result==>>", responseData.data);
+    return {
+      responseCode: 200,
+      responseMessage: "Success",
+      responseResult: responseData.data,
+    };
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const getMarketPriceById = async (ids) => {
+  try {
+    console.log("ids==>>", ids);
+    const responseData = await axios.get(
+      `https://min-api.cryptocompare.com/data/price?fsym=${ids}&tsyms=usd,inr`
+    );
+    console.log("result==>>", responseData.data);
+    return responseData.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const coinconvertById = async (ids, amount) => {
+  try {
+    const responseData = await axios.get(
+      `https://api.coinconvert.net/convert/${ids}/usd?amount=${amount}`
+    );
+    console.log("result==>>", responseData.data);
+    return responseData.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export {
+  generateMnemonic,
+  getBalance,
+  transfer,
+  withdraw,
+  getPrice,
+  getMarketPrice,
+  getMarketPriceById,
+  coinconvertById,
+};

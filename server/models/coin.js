@@ -7,9 +7,7 @@ import coinType from "../enums/coinType";
 import coinImage from "../enums/coinImage";
 import coinIndex from "../enums/coinIndex";
 import {
-  ethereum,
-  binance,
-  polygon,
+  blast,
 } from "../helper/blockchain/constant/constant";
 const options = {
   collection: "coin",
@@ -60,39 +58,43 @@ module.exports = Mongoose.model("coin", coinSchema);
   if (result.length != 0) {
     logger.info("Default coin content already created.");
   } else {
+
     const object1 = {
-      coinName: coinType.USDC,
-      coinImage: coinImage.USDC,
-      coinIndex: coinIndex.USDC,
-      chainId: binance.chainId,
-      chianIdHEX: binance.chianIdHEX,
-      supplyAPY: 4.0,
-      sRewardAPR: 0.5,
-      borrowAPY: 1.3,
-      bRewardAPR: 0.3,
-    };
-    const object2 = {
-      coinName: coinType.WETH,
-      coinImage: coinImage.WETH,
-      coinIndex: coinIndex.WETH,
-      chainId: binance.chainId,
-      chianIdHEX: binance.chianIdHEX,
-      supplyAPY: 7.3,
-      sRewardAPR: 0.1,
-      borrowAPY: 2.5,
-      bRewardAPR: 0.2,
-    };
-    const object3 = {
       coinName: coinType.BLAST,
       coinImage: coinImage.BLAST,
       coinIndex: coinIndex.BLAST,
-      chainId: "168587773",
-      chianIdHEX: "0xA0C71FD",
+      chainId: blast.chainId,
+      chianIdHEX: blast.chianIdHEX,
       supplyAPY: 2.5,
       sRewardAPR: 0.9,
       borrowAPY: 1.6,
       bRewardAPR: 0.5,
     };
+
+    const object2 = {
+      coinName: coinType.USDB,
+      coinImage: coinImage.USDB,
+      coinIndex: coinIndex.USDB,
+      chainId: blast.chainId,
+      chianIdHEX: blast.chianIdHEX,
+      supplyAPY: 4.0,
+      sRewardAPR: 0.5,
+      borrowAPY: 1.3,
+      bRewardAPR: 0.3,
+    };
+
+    const object3 = {
+      coinName: coinType.WETH,
+      coinImage: coinImage.WETH,
+      coinIndex: coinIndex.WETH,
+      chainId: blast.chainId,
+      chianIdHEX: blast.chianIdHEX,
+      supplyAPY: 7.3,
+      sRewardAPR: 0.1,
+      borrowAPY: 2.5,
+      bRewardAPR: 0.2,
+    };
+
 
     let coinResult = await Mongoose.model("coin", coinSchema).create(
       object1,
