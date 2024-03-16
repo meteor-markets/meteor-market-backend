@@ -22,7 +22,7 @@ export const assets = [
   },
   {
     _id: "65c3ade6476743560326cf94",
-    coinName: "USDC",
+    coinName: "USDB",
     coinIndex: 6,
     coinImage:
       "https://res.cloudinary.com/dfd7lapgy/image/upload/v1707247563/d0t9f3yingbhrggzliif.svg",

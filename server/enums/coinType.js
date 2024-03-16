@@ -1,5 +1,5 @@
 module.exports = Object.freeze({
-  USDC: "USDC",
+  USDB: "USDB",
   WETH: "WETH",
   BLAST: "BLAST",
   
